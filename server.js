@@ -7,6 +7,7 @@ var WindshaftServer = require('./http/windshaftServer.js');
 var healthCheck = require('./healthCheck');
 var makeSql = require('./makeSql');
 var config = require('./config');
+var logger = require('simple-node-logger').createSimpleLogger('/var/log/tiler2.log');
 
 // Optional environment variable for reporting exceptions to rollbar.com
 var rollbarAccessToken = process.env.ROLLBAR_SERVER_SIDE_ACCESS_TOKEN;
@@ -108,7 +109,9 @@ var windshaftConfig = {
                                                                zoom,
                                                                isUtfGridRequest,
                                                                isPolygonRequest,
-                                                               req.instanceConfig);
+                                                               req.instanceConfig,
+							       logger);
+		logger.info('req params: ' + req.params.sql);
                 if (isPolygonRequest) {
                     req.params.style = styles.polygonalMapFeature;
                 } else if (isUtfGridRequest) {
@@ -170,4 +173,4 @@ if (rollbarAccessToken) {
 }
 
 ws.listen(port);
-console.log("Map tiles will be served from http://localhost:" + port + windshaftConfig.base_url + '/:zoom/:x/:y');
+logger.info("Map tiles will be served from http://localhost:" + port + windshaftConfig.base_url + '/:zoom/:x/:y');

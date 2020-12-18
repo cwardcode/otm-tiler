@@ -50,6 +50,10 @@ module.exports = {
                 "depends": ["mapFeature"],
                 "sql": "JOIN treemap_plot ON treemap_mapfeature.id = treemap_plot.mapfeature_ptr_id"
             },
+            "tagging_tag": {
+                "depends": ["tree"],
+                "sql": "LEFT OUTER JOIN tagging_taggeditem ON treemap_tree.id = tagging_taggeditem.object_id  LEFT OUTER JOIN tagging_tag ON tagging_taggeditem.tag_id = tagging_tag.id"
+            },
             "rainBarrel": {
                 "depends": ["mapFeature"],
                 "sql": "JOIN stormwater_rainbarrel ON treemap_mapfeature.id = stormwater_rainbarrel.mapfeature_ptr_id"
@@ -105,7 +109,8 @@ module.exports = {
         "bioswale": "stormwater_bioswale",
         "species": "treemap_species",
         "mapFeaturePhoto": "treemap_mapfeaturephoto",
-        "udf": "treemap_userdefinedcollectionvalue"
+        "udf": "treemap_userdefinedcollectionvalue",
+        "tagging_tag": "tagging_tag"
     },
     "udfcTemplates": {
         "tree": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id",

@@ -40,21 +40,29 @@ var utils = require('./filterObjectUtils');
 // Assumes that instanceid is an integer, ready to be plugged
 // directly into SQL
 function makeSqlForMapFeatures(filterString, displayString, restrictFeatureString, instanceid,
-                               zoom, isUtfGridRequest, isPolygonRequest, instanceConfig) {
+                               zoom, isUtfGridRequest, isPolygonRequest, instanceConfig, logger) {
+    logger.info('filterString: ' + filterString)
+    try {
     var geom_spec = config.sqlForMapFeatures.fields.geom,
         geom_field = isPolygonRequest ? geom_spec.polygon : geom_spec.point,
         parsedFilterObject = filterString ? JSON.parse(filterString) : {},
         displayFilters = displayString ? JSON.parse(displayString) : undefined,
         restrictFeatureFilters = restrictFeatureString ? JSON.parse(restrictFeatureString) : undefined,
-
         filterObjectWithDefaults = addDefaultsToFilter(parsedFilterObject, zoom, isPolygonRequest),
         filterObject = units.convertFilterUnits(filterObjectWithDefaults, instanceConfig),
-        tables = filtersToTables(filterObject, displayFilters, isPolygonRequest, isUtfGridRequest),
+        tables = filtersToTables(filterObject, displayFilters, isPolygonRequest, isUtfGridRequest, logger),
 
         where = '',
         displayClause = displayFiltersToWhere(displayFilters, restrictFeatureFilters, displayPlotsOnly(filterObject)),
         filterClause = filterObjectToWhere(filterObject),
         instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : null);
+    } catch(error) {
+       logger.info('error is: ', error)
+    }
+    logger.info('parsedFilterObject: ', parsedFilterObject)
+    logger.info('displayClause: ', displayClause)
+    logger.info('filterObject: ', filterObject)
+    logger.info('filterClause: ', filterClause)
 
     function addToWhere(clause) {
         return where ? '( ' + clause + ' ) AND ' + where : clause;
